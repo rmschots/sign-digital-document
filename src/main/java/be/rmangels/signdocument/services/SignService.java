@@ -76,8 +76,7 @@ public class SignService {
 
     public SigningCompleteDto completeSigning(String securityTokenId, SignResponseDto signResponseDto) {
         log.info("completing signing document");
-        SignSessionData signSessionData = signSessionDataRepository.findById(securityTokenId)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("cannot find signing request for id %s", securityTokenId)));
+        SignSessionData signSessionData = signSessionDataRepository.findOne(securityTokenId);
         DigitalSignatureServiceSession session = sessionMapper.mapToSession(signSessionData.getDigitalSignatureServiceSession());
         validateSignResponse(signResponseDto, session);
         byte[] signedDocument = downloadSignedDocument(session);

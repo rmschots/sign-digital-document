@@ -1,7 +1,9 @@
 package be.rmangels.signdocument.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -10,6 +12,8 @@ import javax.validation.constraints.NotNull;
 @Table(name = "sign_session_data")
 @Builder
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SignSessionData {
 
     @Id
