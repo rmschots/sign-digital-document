@@ -24,7 +24,7 @@ export class AppComponent {
 
   signDocument() {
     const location = window.location;
-    const completationUrl = location .protocol + "//" + location.host + "/" + location.pathname.split('/')[1];
+    const completationUrl = location .protocol + '//' + location.host + '/' + location.pathname.split('/')[1];
     this._httpClient.post<PendingRequest>('/api/sign-document', {completionUrl: completationUrl})
       .subscribe(pendingRequest => {
         this._pendingRequest = pendingRequest;

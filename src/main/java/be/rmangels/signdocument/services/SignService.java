@@ -4,7 +4,15 @@ import be.e_contract.dssp.client.DigitalSignatureServiceClient;
 import be.e_contract.dssp.client.DigitalSignatureServiceSession;
 import be.e_contract.dssp.client.PendingRequestFactory;
 import be.e_contract.dssp.client.SignResponseVerifier;
-import be.e_contract.dssp.client.exception.*;
+import be.e_contract.dssp.client.exception.ApplicationDocumentAuthorizedException;
+import be.e_contract.dssp.client.exception.AuthenticationRequiredException;
+import be.e_contract.dssp.client.exception.ClientRuntimeException;
+import be.e_contract.dssp.client.exception.IncorrectSignatureTypeException;
+import be.e_contract.dssp.client.exception.SubjectNotAuthorizedException;
+import be.e_contract.dssp.client.exception.UnknownDocumentException;
+import be.e_contract.dssp.client.exception.UnsupportedDocumentTypeException;
+import be.e_contract.dssp.client.exception.UnsupportedSignatureTypeException;
+import be.e_contract.dssp.client.exception.UserCancelException;
 import be.rmangels.signdocument.domain.SignSessionData;
 import be.rmangels.signdocument.dto.PendingRequestDto;
 import be.rmangels.signdocument.dto.SignDocumentRequestDto;
@@ -32,107 +40,6 @@ import java.io.IOException;
 @Service
 @Slf4j
 public class SignService {
-
-    private String xmlData =
-            "<document xmlns=\"urn:be:dav:birth\">\n" +
-                    "    <certificateOrigin>NEW BELGIAN CERTIFICATE</certificateOrigin>\n" +
-                    "    <establishingDate>2017-11-09+01:00</establishingDate>\n" +
-                    "    <redactionPlace>\n" +
-                    "        <placeCode>01237</placeCode>\n" +
-                    "        <countryCode>109</countryCode>\n" +
-                    "    </redactionPlace>\n" +
-                    "    <origin>DABS</origin>\n" +
-                    "    <persons>\n" +
-                    "        <person>\n" +
-                    "            <personNumber/>\n" +
-                    "            <nobility/>\n" +
-                    "            <nobilityFree/>\n" +
-                    "            <birthPlace>\n" +
-                    "                <municipalityCode/>\n" +
-                    "                <municipalityFreeText>Barcelona</municipalityFreeText>\n" +
-                    "                <countryCode>109</countryCode>\n" +
-                    "                <countryFreeText/>\n" +
-                    "            </birthPlace>\n" +
-                    "            <birthDate>2017-11-01</birthDate>\n" +
-                    "            <nationalityCode>150</nationalityCode>\n" +
-                    "            <nationalityFree/>\n" +
-                    "            <firstname>Jan</firstname>\n" +
-                    "            <lastname>Test</lastname>\n" +
-                    "            <roles>\n" +
-                    "                <role>CHILD</role>\n" +
-                    "            </roles>\n" +
-                    "        </person>\n" +
-                    "        <person>\n" +
-                    "            <personNumber>93091731824</personNumber>\n" +
-                    "            <origin>RR</origin>\n" +
-                    "            <nobility/>\n" +
-                    "            <nobilityFree/>\n" +
-                    "            <birthPlace>\n" +
-                    "                <municipalityCode>12007</municipalityCode>\n" +
-                    "                <municipalityFreeText/>\n" +
-                    "                <countryCode>150</countryCode>\n" +
-                    "                <countryFreeText/>\n" +
-                    "            </birthPlace>\n" +
-                    "            <birthDate>1993-09-17</birthDate>\n" +
-                    "            <nationalityFree/>\n" +
-                    "            <firstname>Tine Ria Henrik</firstname>\n" +
-                    "            <lastname>Lybeert</lastname>\n" +
-                    "            <roles>\n" +
-                    "                <role>ABS</role>\n" +
-                    "            </roles>\n" +
-                    "        </person>\n" +
-                    "        <person>\n" +
-                    "            <personNumber>82060401577</personNumber>\n" +
-                    "            <origin>RR</origin>\n" +
-                    "            <nobility/>\n" +
-                    "            <nobilityFree/>\n" +
-                    "            <birthPlace>\n" +
-                    "                <municipalityCode>41018</municipalityCode>\n" +
-                    "                <municipalityFreeText/>\n" +
-                    "                <countryCode>150</countryCode>\n" +
-                    "                <countryFreeText/>\n" +
-                    "            </birthPlace>\n" +
-                    "            <birthDate>1982-06-04</birthDate>\n" +
-                    "            <nationalityFree/>\n" +
-                    "            <firstname>Filip Roger Annie</firstname>\n" +
-                    "            <lastname>L'Ecluse</lastname>\n" +
-                    "            <roles>\n" +
-                    "                <role>FATHER</role>\n" +
-                    "            </roles>\n" +
-                    "        </person>\n" +
-                    "        <person>\n" +
-                    "            <personNumber>83110727475</personNumber>\n" +
-                    "            <origin>RR</origin>\n" +
-                    "            <nobility/>\n" +
-                    "            <nobilityFree/>\n" +
-                    "            <birthPlace>\n" +
-                    "                <municipalityCode>24062</municipalityCode>\n" +
-                    "                <municipalityFreeText/>\n" +
-                    "                <countryCode>150</countryCode>\n" +
-                    "                <countryFreeText/>\n" +
-                    "            </birthPlace>\n" +
-                    "            <birthDate>1983-11-07</birthDate>\n" +
-                    "            <nationalityFree/>\n" +
-                    "            <firstname>Anneleen Hilde Marie Edgard</firstname>\n" +
-                    "            <lastname>Van Steen</lastname>\n" +
-                    "            <roles>\n" +
-                    "                <role>MOTHER</role>\n" +
-                    "            </roles>\n" +
-                    "        </person>\n" +
-                    "    </persons>\n" +
-                    "    <oldDocumentReference/>\n" +
-                    "    <docState>FINAL</docState>\n" +
-                    "    <signature/>\n" +
-                    "    <language>nl</language>\n" +
-                    "    <birthTime>10:10:00</birthTime>\n" +
-                    "    <nameDeclaration>\n" +
-                    "        <name>Test</name>\n" +
-                    "        <name1/>\n" +
-                    "        <name2/>\n" +
-                    "    </nameDeclaration>\n" +
-                    "    <nameDeclarationMadeByTheParents>false</nameDeclarationMadeByTheParents>\n" +
-                    "    <gender>MALE</gender>\n" +
-                    "</document>";
 
     @Value("${server.base-url}:${server.port}")
     private String serverBaseUrl;
@@ -209,7 +116,8 @@ public class SignService {
     private DigitalSignatureServiceSession uploadDocument(byte[] pdfData, String mimeType) {
         try {
             return digitalSignatureServiceClient.uploadDocument(mimeType, pdfData);
-        } catch (UnsupportedDocumentTypeException | UnsupportedSignatureTypeException | AuthenticationRequiredException | IncorrectSignatureTypeException | ApplicationDocumentAuthorizedException e) {
+        } catch (UnsupportedDocumentTypeException | UnsupportedSignatureTypeException | AuthenticationRequiredException | IncorrectSignatureTypeException |
+                ApplicationDocumentAuthorizedException e) {
             throw new IllegalArgumentException("could not upload document");
         }
     }
@@ -223,11 +131,10 @@ public class SignService {
     }
 
     private byte[] getXmlData() {
-//        try {
-//            return IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("xml-to-sign.pdf"));
-        return xmlData.getBytes();
-//        } catch (IOException e) {
-//            throw new IllegalArgumentException("could not get pdf");
-//        }
+        try {
+            return IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("sign-me.xml"));
+        } catch (IOException e) {
+            throw new IllegalArgumentException("could not get xml");
+        }
     }
 }

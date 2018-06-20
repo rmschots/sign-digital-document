@@ -9,6 +9,9 @@ public class ApplicationConfig {
 
     @Bean
     public DigitalSignatureServiceClient digitalSignatureServiceClient() {
-        return new DigitalSignatureServiceClient("https://www.e-contract.be/dss-ws/dss");
+        DigitalSignatureServiceClient client = new DigitalSignatureServiceClient("https://doccle.e-contract.be/dss-ws/dss");
+        client.resetCredentials();
+        client.setCredentials("dav","60c4e856");
+        return client;
     }
 }
